@@ -2,7 +2,7 @@
 import os
 
 # Read the data
-path = os.path.join('.', 'data', 'input_day1.txt')
+path = os.path.join('.', 'data', 'day_1_calibration.txt')
 with open(path, 'r', encoding='utf8') as f:
     calibration_data = f.read().splitlines()
 
@@ -24,7 +24,6 @@ MAP = {"1": 1, "one": 1, "2": 2, "two": 2, "3": 3, "three": 3, "4": 4, "four": 4
        "6": 6, "six": 6, "7": 7, "seven": 7, "8": 8, "eight": 8, "9": 9, "nine": 9}
 def filter_calibration_value_with_letters(line: str):
     """Cleans up a calibration value, including numbers written in letters."""
-    print(line)
     first_digit = 0
     last_digit = 0
     for i in range(len(line)):
