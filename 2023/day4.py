@@ -10,7 +10,7 @@ def filter_card_id(scratchcard: str) -> str:
     """Remove the first part of a scratchcard."""
     return scratchcard.split(": ")[1]
 
-def get_numbers(number_str: str) -> list[str]:
+def get_numbers(number_str: str) -> list[int]:
     """Returns a list of numbers from a string of space-separated numbers."""
     return [int(x) for x in number_str.split(" ") if x]  # Filter out empty strings
 
