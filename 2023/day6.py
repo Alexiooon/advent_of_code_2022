@@ -32,12 +32,12 @@ def main():
     for i in range(n_races):
         t1, t2 = calc_roots(times[i], records[i])
         product *= math.floor(t1) - math.floor(t2)
+    print(f"The product of all ways to win is {product}")
 
     # Part 2
     # Combine all races into one big number
     tot_time = int("".join(str(x) for x in times))
     tot_record = int("".join(str(x) for x in records))
-    print(f"The product of all ways to win is {product}")
 
     # Calculate the roots
     t1, t2 = calc_roots(tot_time, tot_record)
