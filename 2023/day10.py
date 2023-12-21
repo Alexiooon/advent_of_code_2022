@@ -1,10 +1,16 @@
-"""Day 9 challenges."""
+"""Day 10 challenges."""
+
+import numpy as np
+
+
+ROT_90 = np.array([[0, 1], [-1, 0]])
 
 
 def read_input_data(path: str):
     """Get the input data."""
     with open(path, 'r', encoding='utf8') as f:
         return f.read().splitlines()
+
 
 def _out_of_bounds(grid: list[str], position: tuple[int, int]) -> bool:
     """Determine whether a given position is out of range or not."""
@@ -45,6 +51,10 @@ def get_connections_out(grid: list[str], position: tuple[int, int]):
     elif pipe == "F":
         y1, x1 = y0, x0 + 1
         y2, x2 = y0 + 1, x0
+    elif pipe == "S":  # Starting position
+        v1, v2 = get_connections_in(grid, position)  # pylint: disable=unbalanced-tuple-unpacking
+        y1, x1 = v1
+        y2, x2 = v2
     else:
         raise ValueError(f"Invalid input value: {pipe}")
 
@@ -61,6 +71,8 @@ def get_connections_in(grid: list[str], position: tuple[int, int]):
     for y in range(-1, 2):
         for x in range(-1, 2):
             new_position = (y0+y, x0+x)
+            if new_position == position:
+                continue
             if _out_of_bounds(grid, position):
                 continue
             try:
@@ -77,13 +89,37 @@ def get_next_position(grid: list[str], position: tuple[int, int], last_position:
     return pos_1 if pos_2 == last_position else pos_2
 
 
+def sweep_grid(grid: list[str], grid_scan: list, pipe_coordinates: list, start: tuple[int, int]):
+    """Recursively sweep and area for tiles which are not included in the main loop."""
+    y0, x0 = start
+    if start in pipe_coordinates:
+        return
+    if grid_scan[y0][x0] == 1:
+        return
+    grid_scan[y0][x0] = 1  # Inside the loop
+
+    # Scan adjacent tiles
+    for y in range(-1, 2):
+        for x in range(-1, 2):
+            new_position = (y0+y, x0+x)
+            if grid_scan[y0+y][x0+x] == 0:  # Not scanned
+                sweep_grid(grid, grid_scan, pipe_coordinates, new_position)
+
+def right_hand_tile(current_position: tuple, next_position: tuple) -> tuple:
+    """Get the grid coordinates for the tile to the right i.e. 90 degree rotation."""
+    y0, x0 = current_position
+    y1, x1 = next_position
+    vec_in = np.array([y1-y0, x1-x0])
+    dy, dx = np.dot(ROT_90, vec_in)
+    return y0+dy, x0+dx
 
 def main():
     """Do not execute main functionality."""
     grid = read_input_data("./data/day_10_pipes.txt")
     start = find_starting_position(grid)
-    pos_1, pos_2 = get_connections_in(grid, start)  # pylint: disable=unbalanced-tuple-unpacking
 
+    # Part 1
+    pos_1, pos_2 = get_connections_in(grid, start)  # pylint: disable=unbalanced-tuple-unpacking
     i = 1  # Iteration variable, by finding the connections to "S" we've already moved 1 step
     last_pos_1 = start
     last_pos_2 = start
@@ -95,6 +131,36 @@ def main():
         if pos_1 == pos_2:  # Paths connected
             break
     print(f"Paths connected after {i} iterations")
+
+    # Part 2
+    # Create a list of all pipe coordinates
+    pos_1, _ = get_connections_in(grid, start)  # pylint: disable=unbalanced-tuple-unpacking
+    pipe_coordinates = [pos_1]  # Coordinates of all pipes in the main loop
+    last_pos_1 = start
+    while True:
+        pos_1, last_pos_1 = get_next_position(grid, pos_1, last_pos_1), pos_1
+        pipe_coordinates.append(pos_1)
+        if pos_1 == start:  # Full loop
+            break
+
+    # Find the most top-left pipe coordinate in the main loop (Row has priority over column)
+    start = sorted(pipe_coordinates)[0]
+    grid_scan = np.zeros(shape=(len(grid[0]), len(grid[0])), dtype=int)  # Array of zeroes
+    pos_1 = (start[0], start[1]+1)
+    last_pos_1 = start
+
+    # Move a full loop through the pipe. For each step, get the tile to the right (relative to
+    # travelling direction) and sweep for tiles not included in the main loop. All things to the
+    # right of the loop in the moving direction is either another pipe or a tile enclosed by the
+    # loop. (Since we always start of an "F" and move to the right)
+    while True:
+        pos_1, last_pos_1 = get_next_position(grid, pos_1, last_pos_1), pos_1
+        rht = right_hand_tile(last_pos_1, pos_1)
+        sweep_grid(grid, grid_scan, pipe_coordinates, rht)
+        if pos_1 == start:  # Full loop
+            break
+
+    print(f"A total of {np.sum(grid_scan)} tiles are enclosed by the main loop")
 
 
 if __name__ == "__main__":
