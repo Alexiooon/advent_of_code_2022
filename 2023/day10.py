@@ -1,7 +1,8 @@
 """Day 10 challenges."""
 
 import numpy as np
-
+import sys
+sys.setrecursionlimit(5000)
 
 ROT_90 = np.array([[0, 1], [-1, 0]])
 
@@ -92,18 +93,24 @@ def get_next_position(grid: list[str], position: tuple[int, int], last_position:
 def sweep_grid(grid: list[str], grid_scan: list, pipe_coordinates: list, start: tuple[int, int]):
     """Recursively sweep and area for tiles which are not included in the main loop."""
     y0, x0 = start
+    if _out_of_bounds(grid, start):
+        return
     if start in pipe_coordinates:
+        grid_scan[y0][x0] = 1
         return
-    if grid_scan[y0][x0] == 1:
+    if grid_scan[y0][x0] == 2:
         return
-    grid_scan[y0][x0] = 1  # Inside the loop
+    grid_scan[y0][x0] = 2  # Inside the loop
 
     # Scan adjacent tiles
-    for y in range(-1, 2):
-        for x in range(-1, 2):
-            new_position = (y0+y, x0+x)
-            if grid_scan[y0+y][x0+x] == 0:  # Not scanned
-                sweep_grid(grid, grid_scan, pipe_coordinates, new_position)
+    for y, x in [(-1, -1), (-1, 1), (1, -1), (1, 1)]:
+        new_position = (y0+y, x0+x)
+        if new_position == start:
+            continue
+        if _out_of_bounds(grid, new_position):
+            continue
+        if grid_scan[y0+y][x0+x] == 0:  # Not scanned
+            sweep_grid(grid, grid_scan, pipe_coordinates, new_position)
 
 def right_hand_tile(current_position: tuple, next_position: tuple) -> tuple:
     """Get the grid coordinates for the tile to the right i.e. 90 degree rotation."""
@@ -112,6 +119,21 @@ def right_hand_tile(current_position: tuple, next_position: tuple) -> tuple:
     vec_in = np.array([y1-y0, x1-x0])
     dy, dx = np.dot(ROT_90, vec_in)
     return y0+dy, x0+dx
+
+
+def poly_area(xy):
+    """ 
+        Calculates polygon area.
+        x = xy[:,0], y = xy[:,1]
+    """
+    l = len(xy)
+    s = 0.0
+    # Python arrys are zer0-based
+    for i in range(l):
+        j = (i+1)%l  # keep index in [0,l)
+        s += (xy[j,0] - xy[i,0])*(xy[j,1] + xy[i,1])
+    return -0.5*s
+
 
 def main():
     """Do not execute main functionality."""
@@ -153,15 +175,25 @@ def main():
     # travelling direction) and sweep for tiles not included in the main loop. All things to the
     # right of the loop in the moving direction is either another pipe or a tile enclosed by the
     # loop. (Since we always start of an "F" and move to the right)
-    while True:
-        pos_1, last_pos_1 = get_next_position(grid, pos_1, last_pos_1), pos_1
-        rht = right_hand_tile(last_pos_1, pos_1)
-        sweep_grid(grid, grid_scan, pipe_coordinates, rht)
-        if pos_1 == start:  # Full loop
-            break
+    # rht = right_hand_tile(last_pos_1, pos_1)
+    # sweep_grid(grid, grid_scan, pipe_coordinates, rht)
 
-    print(f"A total of {np.sum(grid_scan)} tiles are enclosed by the main loop")
+    # while True:
+    #     pos_1, last_pos_1 = get_next_position(grid, pos_1, last_pos_1), pos_1
+    #     rht = right_hand_tile(last_pos_1, pos_1)
+    #     sweep_grid(grid, grid_scan, pipe_coordinates, rht)
+    #     if pos_1 == start:  # Full loop
+    #         break
 
+    print(f"A total of {np.sum(np.floor(grid_scan/2))} tiles are enclosed by the main loop")
+    print(f"A total of {len(pipe_coordinates)} tiles are in the main loop")
+    print(f"Calculated value: {poly_area(np.array(pipe_coordinates))}")
+    shape_1 = np.array([[0,0],[1,0],[1,1],[0,1]])
+    print(poly_area(shape_1))
 
 if __name__ == "__main__":
     main()
+
+# Correct value is between 441 < x < 453
+# \[ A=\sum_{i=1}^{N-1}I_{i+1,i}+I_{1,N} \] where e.g. \[ I_{2,1}=\intop_{x_{1}}^{x_{2}}ydx=\frac{1}{2}(y_{2}+y_{1})(x_{2}-x_{1}) \]
+#
