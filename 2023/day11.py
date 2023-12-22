@@ -7,34 +7,6 @@ def read_input(path):
         return f.read().splitlines()
 
 
-def expand_universe(universe: np.ndarray):
-    """Return an expanded copy of the universe."""
-    i = 0
-    empty_rows = []
-    while i < universe.shape[0]:
-        row = universe[i,:]
-        if "#" not in row:
-            empty_rows.append(i)
-        i += 1
-    print(empty_rows)
-
-    j = 0
-    empty_cols = []
-    while j < universe.shape[1]:
-        col = universe[:,j]
-        if "#" not in col:
-            empty_cols.append(j)
-        j += 1
-    print(empty_cols)
-
-
-def calc_distance(galaxy_1: tuple[int, int], galaxy_2: tuple[int, int]) -> int:
-    """Calcualte the distance between two galaxies."""
-    base_distance = abs(galaxy_1[0] - galaxy_2[0]) + abs(galaxy_1[1] - galaxy_2[1])
-    # Calculate the extra distance due to expansion
-    return base_distance
-
-
 class Universe():
     """The observable universe (or well, what has been mapped in this observatory)."""
 
@@ -63,10 +35,15 @@ class Universe():
     def find_galaxies(self):
         """Find all galaxies in the observed universe."""
         galaxies = []
+        for i in range(self.starmap.shape[0]):
+            for j in range(self.starmap.shape[1]):
+                if self.starmap[i,j] == "#":
+                    galaxies.append((i,j))
         return galaxies
 
 
-    def calc_distance(self, galaxy_1: tuple[int, int], galaxy_2: tuple[int, int]) -> int:
+    def calc_distance(self, galaxy_1: tuple[int, int], galaxy_2: tuple[int, int],
+                      expansion_factor: int) -> int:
         """Calcualte the distance between two galaxies."""
         distance = abs(galaxy_1[0] - galaxy_2[0]) + abs(galaxy_1[1] - galaxy_2[1])
 
@@ -75,8 +52,8 @@ class Universe():
         max_y = max(galaxy_1[0], galaxy_2[0])
         min_x = min(galaxy_1[1], galaxy_2[1])
         max_x = max(galaxy_1[1], galaxy_2[1])
-        distance += len(y for y in self.empty_rows if min_y < y < max_y)
-        distance += len(x for x in self.empty_cols if min_x < x < max_x)
+        distance += len([y for y in self.empty_rows if min_y < y < max_y])*(expansion_factor-1)
+        distance += len([x for x in self.empty_cols if min_x < x < max_x])*(expansion_factor-1)
         return distance
 
 
@@ -86,10 +63,15 @@ def main():
     universe = Universe(full_data)
     universe.expand()
     galaxies = universe.find_galaxies()
-    for row in full_data:
-        galaxies += row.count("#")
-    print(galaxies)
-    print(f"Distances to count: {int(galaxies*(galaxies-1)/2)}")
+    tot_dist = 0
+    tot_big_dist = 0
+    for i in range(len(galaxies)-1):
+        for j in range(i+1, len(galaxies)):
+            tot_dist += universe.calc_distance(galaxies[i], galaxies[j], expansion_factor=2)
+            tot_big_dist += universe.calc_distance(galaxies[i], galaxies[j],
+                                                   expansion_factor=1000000)
+    print(f"Sum of distances between galaxies in expanded universe: {tot_dist}")
+    print(f"Sum of distances between galaxies in very big expanded universe: {tot_big_dist}")
 
 if __name__ == '__main__':
     main()
