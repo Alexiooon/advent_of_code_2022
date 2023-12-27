@@ -7,6 +7,13 @@ def read_input(path):
         return f.read().splitlines()
 
 
+def calc_distance(galaxy_1: tuple[int, int], galaxy_2: tuple[int, int]) -> int:
+    """Calcualte the distance between two galaxies."""
+    base_distance = abs(galaxy_1[0] - galaxy_2[0]) + abs(galaxy_1[1] - galaxy_2[1])
+    # Calculate the extra distance due to expansion
+    return base_distance
+
+
 class Universe():
     """The observable universe (or well, what has been mapped in this observatory)."""
 
