@@ -7,27 +7,6 @@ def read_input(path):
         return f.read().splitlines()
 
 
-def expand_universe(universe: np.ndarray):
-    """Return an expanded copy of the universe."""
-    i = 0
-    empty_rows = []
-    while i < universe.shape[0]:
-        row = universe[i,:]
-        if "#" not in row:
-            empty_rows.append(i)
-        i += 1
-    print(empty_rows)
-
-    j = 0
-    empty_cols = []
-    while j < universe.shape[1]:
-        col = universe[:,j]
-        if "#" not in col:
-            empty_cols.append(j)
-        j += 1
-    print(empty_cols)
-
-
 def calc_distance(galaxy_1: tuple[int, int], galaxy_2: tuple[int, int]) -> int:
     """Calcualte the distance between two galaxies."""
     base_distance = abs(galaxy_1[0] - galaxy_2[0]) + abs(galaxy_1[1] - galaxy_2[1])
