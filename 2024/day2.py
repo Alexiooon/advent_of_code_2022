@@ -1,6 +1,7 @@
 """Day 2 solutions."""
 
 DATA_PATH = "./data/day2_reports.txt"
+MAX_INCREASE = 3
 
 
 def read_input(path):
@@ -11,8 +12,9 @@ def read_input(path):
 
 def is_safe(report: list[int]) -> bool:
     """Determine whether a report is safe or not."""
-    diffs = [report[i] - report[i+1] for i in range(len(report)-1)]
-    return all(1 <= x <= 3 for x in diffs) or all(-1 >= x >= -3 for x in diffs)
+    diffs = [report[i] - report[i + 1] for i in range(len(report) - 1)]
+    return all(1 <= x <= MAX_INCREASE for x in diffs) or \
+           all(-1 >= x >= -MAX_INCREASE for x in diffs)
 
 
 def main():
@@ -31,7 +33,7 @@ def main():
     # Part 2: Just brute force, the input is small enough
     for report in unsafe_reports:
         for i in range(len(report)):
-            if is_safe(report[:i] + report[i+1:]):
+            if is_safe(report[:i] + report[i + 1:]):
                 safe_reports_count += 1
                 break
     print(f"There are {safe_reports_count} safe reports after corrections.")

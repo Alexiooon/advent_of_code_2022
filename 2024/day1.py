@@ -12,7 +12,7 @@ def read_input(path):
 def main():
     """Solve today's puzzles."""
     data = read_input(DATA_PATH)
-    
+
     # Re-organize into something a bit nicer to work with
     col0 = []
     col1 = []
@@ -20,7 +20,7 @@ def main():
         x0, x1 = line.split("   ")
         col0.append(int(x0))
         col1.append(int(x1))
-    
+
     # Solve it
     col0.sort()
     col1.sort()

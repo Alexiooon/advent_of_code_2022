@@ -36,17 +36,17 @@ def main():
             break  # Reached the end
 
         i += search_idx
-        if memory[i:i+3] == "do(":
+        if memory[i:i + 3] == "do(":
             is_enabled = True
             i += 1
             continue
-        elif memory[i:i+3] == "don":
+        elif memory[i:i + 3] == "don":
             is_enabled = False
             i += 1
             continue
 
         close_bracket = i + memory[i:].find(")")
-        mem_range = memory[i+4:close_bracket]
+        mem_range = memory[i + 4:close_bracket]
         try:
             factors = mem_range.split(",")
             assert all(len(x) < 4 for x in factors)

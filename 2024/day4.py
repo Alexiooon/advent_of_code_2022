@@ -1,8 +1,10 @@
 """Day 4 solutions."""
+# ruff: noqa: E226 for this one I think the whitespace hurts more than it helps
 
 DATA_PATH = "./data/day4_words.txt"
 LENGTH = 140  # Line length
 KEY_WORD = "XMAS"
+
 
 def read_input(path):
     """Read the input data."""
@@ -14,12 +16,13 @@ def _crosses_boundary(indexes: list[int]) -> bool:
     """Checks whether a set of indexes crosses the boundary of an array."""
     if any(x < 0 for x in indexes):
         return True
-    if any(x % LENGTH <= 1 for x in indexes) and any(x % LENGTH >= LENGTH-2 for x in indexes):
+    if any(x % LENGTH <= 1 for x in indexes) and any(x % LENGTH >= LENGTH - 2 for x in indexes):
         return True
     if any(x >= LENGTH**2 for x in indexes):
         return True
 
     return False
+
 
 def check_word(data: str, indexes: list[int]) -> bool:
     """Check for key word."""
@@ -38,7 +41,7 @@ def is_x_mas(data: str, indexes: list[int]) -> bool:
     if _crosses_boundary(indexes):
         return False
     diag_string = "".join([data[i] for i in indexes])  # String of all 4 letters
-    return diag_string in ["MMSS", "SMMS", "SSMM", "MSSM"]
+    return diag_string in {"MMSS", "SMMS", "SSMM", "MSSM"}
 
 
 def main():
@@ -58,9 +61,9 @@ def main():
         xmas_counter[2] += check_word(data, [i, i+LENGTH, i+2*LENGTH, i+3*LENGTH])  # Vertical down
         xmas_counter[3] += check_word(data, [i, i-LENGTH, i-2*LENGTH, i-3*LENGTH])  # Vertical up
         xmas_counter[4] += check_word(data, [i, i+(LENGTH+1), i+2*(LENGTH+1), i+3*(LENGTH+1)])
-        xmas_counter[5] += check_word(data, [i, i+(LENGTH-1), i+2*(LENGTH-1), i+3*(LENGTH-1)])  # Diagonal down-left
-        xmas_counter[6] += check_word(data, [i, i-(LENGTH+1), i-2*(LENGTH+1), i-3*(LENGTH+1)])  # Diagonal up-left
-        xmas_counter[7] += check_word(data, [i, i-(LENGTH-1), i-2*(LENGTH-1), i-3*(LENGTH-1)])  # Diagonal up-right
+        xmas_counter[5] += check_word(data, [i, i+(LENGTH-1), i+2*(LENGTH-1), i+3*(LENGTH-1)])
+        xmas_counter[6] += check_word(data, [i, i-(LENGTH+1), i-2*(LENGTH+1), i-3*(LENGTH+1)])
+        xmas_counter[7] += check_word(data, [i, i-(LENGTH-1), i-2*(LENGTH-1), i-3*(LENGTH-1)])
         i += 1
 
     print(f"There are {sum(xmas_counter)} '{KEY_WORD}' in the puzzle")
