@@ -11,18 +11,18 @@ def parse_input(path: str) -> list[int]:
 
 
 def map_stone(stone: int):
-    """ S P L I T   T H E   S T O N E S . """
+    """Map a stone to a list of its new values after a blink."""
     if stone == 0:
         return [1]
-    
+
     if len(str(stone)) % 2 == 0:
         strone = str(stone)
-        return [int(strone[:int(len(strone)/2)]), int(strone[int(len(strone)/2):])]
+        return [int(strone[:int(len(strone) / 2)]), int(strone[int(len(strone) / 2):])]
 
-    return [2024*stone]
+    return [2024 * stone]
 
 
-def stone_list_to_dict(stones: list[int], count: int=1):
+def stone_list_to_dict(stones: list[int], count: int = 1):
     """Convert a list of stones to a dictionary of stones."""
     new_dict = {}
     for val in stones:
@@ -59,7 +59,6 @@ def main():
                 continue
             ns = map_stone(key)
             count_stone(new_stones, stone_list_to_dict(ns, val))
-        
         stone_dict = new_stones
     stone_count = sum(val for val in stone_dict.values())
     print(f"After {blinks} blinks there are {stone_count} stones in the arrangement")
@@ -73,7 +72,7 @@ def main():
                 continue
             ns = map_stone(key)
             count_stone(new_stones, stone_list_to_dict(ns, val))
-        
+
         stone_dict = new_stones
     stone_count = sum(val for val in stone_dict.values())
     print(f"After {blinks} more blinks there are {stone_count} stones in the arrangement")
